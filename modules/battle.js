@@ -8,7 +8,7 @@ let uid='',code='',room=null,unsubscribe=null,offset=0,connected=false,raf=0,sho
 const now=()=>Date.now()+offset,report=e=>{console.error('Reflex:',e);$('battleMessage').textContent=e.code?window.FormwheelUI?.errorMessage(e)||e.message:(!['TypeError','ReferenceError'].includes(e.name)?e.message:'게임 화면 처리 중 오류가 발생했습니다.')};
 onValue(ref(db,'.info/serverTimeOffset'),s=>offset=Number(s.val())||0);
 onValue(ref(db,'.info/connected'),async s=>{connected=s.val()===true;$('battleNetwork').textContent=connected?'🟢 연결됨':'🔴 연결 대기 · 기록 제출은 연결 후 가능합니다';if(connected&&code&&uid){try{await onDisconnect(ref(db,`reflexRooms/${code}/presence/${uid}`)).set(false);await set(ref(db,`reflexRooms/${code}/presence/${uid}`),true)}catch(e){report(e)}}});
-async function authenticate(){if(auth.currentUser)uid=auth.currentUser.uid;else uid=(await signInAnonymously(auth)).user.uid;return uid}
+async function authenticate(){await auth.authStateReady();if(auth.currentUser)uid=auth.currentUser.uid;else uid=(await signInAnonymously(auth)).user.uid;return uid}
 function delay(){const value=crypto.getRandomValues(new Uint32Array(1))[0];return 1800+value%3001}
 function name(){const value=$('battleName').value.trim().slice(0,12);if(!value)throw new Error('닉네임을 입력하세요.');return value}
 async function enter(nextCode){
