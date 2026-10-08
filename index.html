@@ -5,62 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f8fc">
 <title>FormWheel Reflex</title>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f7f8fc;color:#17181c}
-body{display:flex;justify-content:center}
-button{font:inherit;border:0;cursor:pointer}
-.app{width:min(760px,100%);min-height:100vh;padding:22px 18px 34px}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.logo{font-weight:900;font-size:24px;letter-spacing:-1.3px;color:#17181c;background:none;padding:4px 0}
-.logo span{font-weight:500;color:#777}
-.home{padding:9px 13px;border-radius:12px;background:#fff;border:1px solid #e4e6eb;color:#555;font-weight:700}
-.card{background:#fff;border:1px solid #e4e6eb;border-radius:24px;box-shadow:0 10px 35px rgba(20,25,35,.06)}
-.intro{padding:30px;text-align:center}
-.badge{display:inline-block;padding:7px 11px;border-radius:999px;background:#f0f2f6;color:#666;font-size:12px;font-weight:800;margin-bottom:12px}
-h1{margin:0;font-size:38px;letter-spacing:-2px}
-.sub{margin:10px 0 0;color:#737782;line-height:1.6}
-.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0}
-.rule{padding:16px 10px;border-radius:16px;background:#f7f8fa}
-.rule b{display:block;font-size:15px;margin-bottom:5px}
-.rule span{font-size:12px;color:#858994}
-.primary{width:100%;padding:15px;border-radius:15px;background:#17181c;color:#fff;font-weight:800}
-.primary:hover{opacity:.92}
-.game{display:none;padding:16px}
-.game-top{display:flex;justify-content:space-between;align-items:center;padding:5px 7px 14px;color:#747781;font-size:13px;font-weight:700}
-.stage{height:min(62vh,520px);min-height:360px;border-radius:20px;background:#f0f2f5;display:flex;align-items:center;justify-content:center;text-align:center;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:background .12s}
-.stage .big{font-size:clamp(38px,9vw,70px);font-weight:900;letter-spacing:-3px}
-.stage .small{margin-top:9px;color:#777;font-weight:600}
-.stage.wait{background:#f0f2f5;color:#17181c}
-.stage.ready{background:#e9edf3;color:#17181c}
-.stage.go{background:#17181c;color:#fff}
-.stage.go .small{color:#c9cbd0}
-.stage.early{background:#f1dfe1;color:#7b232b}
-.stage.done{background:#e9edf3}
-.result{display:none;padding:28px;text-align:center}
-.result .label{color:#777;font-size:13px;font-weight:800}
-.result .time{font-size:72px;letter-spacing:-4px;font-weight:900;margin:5px 0}
-.result .unit{font-size:18px;color:#777;font-weight:700}
-.rank{display:inline-block;margin:12px 0 20px;padding:8px 13px;border-radius:999px;background:#f0f2f6;font-weight:800}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 22px}
-.stat{background:#f7f8fa;border-radius:15px;padding:14px 8px}
-.stat b{display:block;font-size:18px}
-.stat span{font-size:11px;color:#858994}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.secondary{padding:14px;border-radius:14px;background:#f0f1f4;color:#25272c;font-weight:800}
-.note{margin-top:14px;text-align:center;color:#92959d;font-size:11px}
-@media(max-width:520px){
- .app{padding:16px 12px 25px}
- .intro{padding:25px 18px}
- h1{font-size:34px}
- .rules{gap:7px}
- .rule{padding:13px 7px}
- .stage{min-height:340px}
- .result .time{font-size:60px}
-}
-</style>
+<link rel="stylesheet" href="./assets/styles.css">
 <link rel="stylesheet" href="https://semicolonxss.github.io/Formwheel/shared/formwheel-ui.css">
 <script defer src="https://semicolonxss.github.io/Formwheel/shared/formwheel-ui.js"></script>
+<link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
+<meta property="og:title" content="Reflex · Formwheel">
+<meta property="og:description" content="혼자 반응 속도를 측정하고 이 기기의 최고 기록에 도전하는 게임.">
+<meta property="og:image" content="https://semicolonxss.github.io/Formwheel_Reflex/assets/thumbnail.svg">
 </head>
 <body>
 <main class="app">
@@ -109,160 +60,13 @@ h1{margin:0;font-size:38px;letter-spacing:-2px}
       <button class="primary" id="gamesBtn">Games로</button>
     </div>
   </section>
+<section class="card" style="padding:24px;margin-top:20px"><h2>⚔️ Battle</h2><p id="battleNetwork" role="status">연결 확인 중</p><label>닉네임 <input id="battleName" maxlength="12" autocomplete="nickname"></label><label>방 코드 <input id="battleCode" maxlength="4" inputmode="numeric"></label><div class="actions" style="margin-top:12px"><button id="battleCreate" class="secondary">방 만들기</button><button id="battleJoin" class="secondary">참가</button><button id="battleStart" class="primary" hidden>5라운드 시작 / 재시작</button><button id="battleLeave" class="secondary" hidden>나가기</button></div><p id="battleMessage" role="status"></p><button id="battleTap" class="primary" style="height:190px;font-size:36px;touch-action:manipulation" hidden>READY</button><ol id="battlePlayers"></ol></section>
 </main>
 
-<script>
-const HOME_URL = "https://semicolonxss.github.io/Formwheel/";
-
-const intro = document.getElementById("intro");
-const game = document.getElementById("game");
-const result = document.getElementById("result");
-const stage = document.getElementById("stage");
-const stageTitle = document.getElementById("stageTitle");
-const stageSub = document.getElementById("stageSub");
-const roundText = document.getElementById("roundText");
-const bestText = document.getElementById("bestText");
-
-let round = 0;
-let maxRounds = 5;
-let times = [];
-let timer = null;
-let goAt = 0;
-let waiting = false;
-let gameActive = false;
-let phase = "idle";
-let transitionTimer = null;
-let best = 0;
-try { best = Number(localStorage.getItem("formwheel_reflex_best") || 0) || 0; } catch {}
-
-function goHome(){
-  window.location.href = HOME_URL;
-}
-
-document.getElementById("logo").addEventListener("click", goHome);
-document.getElementById("homeBtn").addEventListener("click", goHome);
-document.getElementById("gamesBtn").addEventListener("click", goHome);
-
-function showGame(){
-  intro.style.display = "none";
-  result.style.display = "none";
-  game.style.display = "block";
-  clearTimeout(timer);
-  clearTimeout(transitionTimer);
-  round = 0;
-  times = [];
-  gameActive = true;
-  updateBest();
-  nextRound();
-}
-
-function updateBest(){
-  bestText.textContent = best ? `BEST ${best}ms` : "BEST —";
-}
-
-function setStage(type,title,sub){
-  stage.className = "stage " + type;
-  stageTitle.textContent = title;
-  stageSub.textContent = sub;
-}
-
-function nextRound(retry = false){
-  if(!retry) round++;
-  phase = "waiting";
-  roundText.textContent = `ROUND ${round} / ${maxRounds}`;
-  waiting = true;
-  setStage("ready","READY","잠시 후 화면이 바뀝니다");
-
-  const delay = 1200 + Math.random()*3000;
-  clearTimeout(timer);
-  timer = setTimeout(()=>{
-    if(!gameActive) return;
-    waiting = false;
-    phase = "go";
-    goAt = performance.now();
-    setStage("go","GO!","지금 클릭!");
-  }, delay);
-}
-
-function early(){
-  phase = "early";
-  clearTimeout(timer);
-  waiting = false;
-  setStage("early","TOO EARLY!","너무 빨랐어요");
-  transitionTimer = setTimeout(()=>{
-    if(!gameActive) return;
-    nextRound(true);
-  },900);
-}
-
-function hit(){
-  if(!gameActive) return;
-  if(phase === "waiting"){
-    early();
-    return;
-  }
-  if(phase !== "go") return;
-  phase = "done";
-  const time = Math.round(performance.now() - goAt);
-  times.push(time);
-  setStage("done",`${time} ms`,"좋아요!");
-  waiting = true;
-  transitionTimer = setTimeout(()=>{
-    if(!gameActive) return;
-    if(round >= maxRounds) finish();
-    else nextRound();
-  },650);
-}
-
-stage.tabIndex = 0;
-stage.setAttribute("role", "button");
-stage.setAttribute("aria-label", "반응속도 측정: Space 또는 Enter");
-stage.addEventListener("keydown", e => {
-  if((e.code === "Space" || e.code === "Enter") && !e.repeat){e.preventDefault();hit();}
-});
-stage.addEventListener("pointerdown",(e)=>{
-  e.preventDefault();
-  hit();
-});
-
-document.getElementById("startBtn").addEventListener("click", showGame);
-document.getElementById("againBtn").addEventListener("click", showGame);
-
-function getRank(avg){
-  if(avg <= 200) return "⚡ 인간 병기";
-  if(avg <= 250) return "🔥 엄청 빠름";
-  if(avg <= 300) return "💨 매우 빠름";
-  if(avg <= 400) return "👍 괜찮은 반응";
-  if(avg <= 500) return "🙂 조금 더 연습";
-  return "🐢 천천히 가는 중";
-}
-
-function finish(){
-  gameActive = false;
-  phase = "finished";
-  clearTimeout(transitionTimer);
-  clearTimeout(timer);
-  const avg = Math.round(times.reduce((a,b)=>a+b,0)/times.length);
-  const personalBest = Math.min(...times);
-
-  if(!best || personalBest < best){
-    best = personalBest;
-    try { localStorage.setItem("formwheel_reflex_best", best); } catch {}
-  }
-
-  document.getElementById("finalTime").textContent = avg;
-  document.getElementById("rank").textContent = getRank(avg);
-  document.getElementById("bestStat").textContent = `${best} ms`;
-  document.getElementById("avgStat").textContent = `${avg} ms`;
-  document.getElementById("roundStat").textContent = `${times.length}`;
-
-  game.style.display = "none";
-  result.style.display = "block";
-}
-
-updateBest();
-</script>
+<script src="./assets/app.js"></script>
+<script type="module" src="./modules/battle.js"></script>
 </body>
 </html>
+
 
 
