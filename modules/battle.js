@@ -20,7 +20,22 @@ async function enter(nextCode){
 }
 async function create(){if($('game').style.display==='block')throw new Error('솔로 게임을 마친 뒤 배틀을 시작하세요.');if(code)throw new Error('현재 방에서 먼저 나가세요.');await authenticate();const nickname=name();for(let attempt=0;attempt<12;attempt++){const next=String(1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000),result=await runTransaction(ref(db,`reflexRooms/${next}`),cur=>cur?undefined:{version:1,status:'lobby',host:uid,round:0,players:{[uid]:{name:nickname}},presence:{[uid]:true},createdAt:now()});if(result.committed){await enter(next);return}}throw new Error('빈 방 코드를 찾지 못했습니다. 다시 시도하세요.')}
 async function join(){if($('game').style.display==='block')throw new Error('솔로 게임을 마친 뒤 배틀에 참가하세요.');if(code)throw new Error('현재 방에서 먼저 나가세요.');await authenticate();const nickname=name(),next=$('battleCode').value.trim();if(!/^\d{4}$/.test(next))throw new Error('4자리 방 코드를 입력하세요.');const target=ref(db,`reflexRooms/${next}`),snapshot=await get(target);if(!snapshot.exists())throw new Error('존재하지 않는 방입니다.');const result=await runTransaction(target,cur=>{if(cur===null)return cur;if(cur.status!=='lobby'||Object.keys(cur.players||{}).length>=16)return;cur.players[uid]={name:nickname};cur.presence??={};cur.presence[uid]=true;return cur});if(!result.committed||!result.snapshot.val()?.players?.[uid])throw new Error('방이 없거나 이미 시작되었거나 가득 찼습니다.');await enter(next)}
-async function leave(){if(!code)return;cancelAnimationFrame(raf);unsubscribe?.();unsubscribe=null;const old=code;code='';room=null;try{sessionStorage.removeItem('formwheel_reflex_room');await onDisconnect(ref(db,`reflexRooms/${old}/presence/${uid}`)).cancel();await runTransaction(ref(db,`reflexRooms/${old}`),cur=>{if(!cur)return;delete cur.players?.[uid];delete cur.presence?.[uid];const remaining=Object.keys(cur.players||{});if(!remaining.length)return null;if(cur.host===uid)cur.host=remaining[0];return cur})}finally{render()}}
+async function leave(){
+ if(!code)return;
+ const old=code,target=ref(db,`reflexRooms/${old}`);await get(target);
+ const result=await runTransaction(target,cur=>{
+  if(cur===null)return null;
+  delete cur.players?.[uid];delete cur.presence?.[uid];
+  const remaining=Object.keys(cur.players||{});
+  if(!remaining.length)return null;
+  if(cur.host===uid)cur.host=remaining[0];
+  return cur;
+ });
+ if(!result.committed)throw new Error('퇴장 저장에 실패했습니다. 다시 시도하세요.');
+ cancelAnimationFrame(raf);unsubscribe?.();unsubscribe=null;code='';room=null;
+ try{sessionStorage.removeItem('formwheel_reflex_room');await onDisconnect(ref(db,`reflexRooms/${old}/presence/${uid}`)).cancel()}finally{render()}
+}
+
 async function start(){if(!code)return;const result=await runTransaction(ref(db,`reflexRooms/${code}`),cur=>{if(!cur||cur.host!==uid||cur.status==='playing'||Object.keys(cur.players||{}).filter(id=>cur.presence?.[id]!==false).length<2)return;for(const id of Object.keys(cur.players))if(cur.presence?.[id]===false){delete cur.players[id];delete cur.presence[id]}cur.status='playing';cur.round=1;cur.goAt=now()+delay();cur.results={};return cur});if(!result.committed)throw new Error('방장이 온라인 플레이어 2명 이상일 때 시작할 수 있습니다.');shownRound=0;submittedRound=0}
 function render(){
  const list=$('battlePlayers');list.replaceChildren();$('startBtn').disabled=!!code;$('battleLeave').hidden=!code;$('battleStart').hidden=!room||room.host!==uid||room.status==='playing';$('battleTap').hidden=room?.status!=='playing';
