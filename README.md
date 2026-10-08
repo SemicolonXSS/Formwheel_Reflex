@@ -1,6 +1,6 @@
 # Formwheel_Reflex
 
-혼자 반응 속도를 측정하고 이 기기의 최고 기록에 도전하는 게임.
+솔로 기록과 5라운드 실시간 배틀로 반응속도를 겨루는 게임.
 
 - 실행: https://semicolonxss.github.io/Formwheel_Reflex/
 - 프로젝트 목록: https://semicolonxss.github.io/Formwheel/
