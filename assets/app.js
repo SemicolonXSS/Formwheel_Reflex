@@ -144,6 +144,7 @@ function finish(){
 
   game.style.display = "none";
   result.style.display = "block";
+  window.dispatchEvent(new CustomEvent("fw:4050:complete",{detail:{gameId:"reflex"}}));
 }
 
 updateBest();
