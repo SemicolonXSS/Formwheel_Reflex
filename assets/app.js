@@ -37,8 +37,19 @@ function showGame(){
   clearTimeout(transitionTimer);
   round = 0;
   times = [];
-  gameActive = true;
+  gameActive = false;
+  phase = "idle";
+  waiting = false;
+  roundText.textContent = `ROUND 1 / ${maxRounds}`;
+  setStage("ready", "READY", "아래 시작 버튼을 누르면 시작합니다");
+  document.getElementById("roundStartBtn").hidden = false;
   updateBest();
+}
+
+function startRounds(){
+  if(gameActive) return;
+  document.getElementById("roundStartBtn").hidden = true;
+  gameActive = true;
   nextRound();
 }
 
@@ -112,6 +123,7 @@ stage.addEventListener("pointerdown",(e)=>{
 });
 
 document.getElementById("startBtn").addEventListener("click", showGame);
+document.getElementById("roundStartBtn").addEventListener("click", startRounds);
 document.getElementById("againBtn").addEventListener("click", showGame);
 
 function getRank(avg){
