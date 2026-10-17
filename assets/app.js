@@ -111,6 +111,23 @@ function hit(){
   },650);
 }
 
+// Switching tabs or locking the screen must not create unfair reaction times.
+let pausedForVisibility = false;
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){
+    if(gameActive && (phase === "waiting" || phase === "go")){
+      pausedForVisibility = true;
+      clearTimeout(timer);
+      waiting = false;
+      phase = "paused";
+      setStage("ready","PAUSED","화면으로 돌아오면 현재 라운드를 다시 시작합니다");
+    }
+  }else if(pausedForVisibility){
+    pausedForVisibility = false;
+    if(gameActive && phase === "paused") nextRound(true);
+  }
+});
+
 stage.tabIndex = 0;
 stage.setAttribute("role", "button");
 stage.setAttribute("aria-label", "반응속도 측정: Space 또는 Enter");
