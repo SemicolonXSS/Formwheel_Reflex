@@ -148,6 +148,10 @@ function finish(){
     try { localStorage.setItem("formwheel_reflex_best", best); } catch {}
   }
 
+  // Inform the Spotlight tab only after a genuine completed solo run.
+  if(avg<=300 && window.opener && !window.opener.closed){
+    window.opener.postMessage({type:"formwheel-spotlight-result-v1",project:"Reflex",value:avg},"https://semicolonxss.github.io");
+  }
   document.getElementById("finalTime").textContent = avg;
   document.getElementById("rank").textContent = getRank(avg);
   document.getElementById("bestStat").textContent = `${best} ms`;
