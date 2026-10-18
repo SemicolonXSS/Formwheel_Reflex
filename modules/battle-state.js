@@ -6,7 +6,7 @@ export function submit(room,uid,roundNumber,result){
 export function advance(room,now,delay){
  if(!room||room.status!=='playing')return;
  room.results??={};room.results[room.round]??={};const entries=room.results[room.round],players=Object.keys(room.players||{});
- if(now>=room.goAt+10000)for(const uid of players)if(!entries[uid])entries[uid]={ms:2000,kind:'timeout'};
+ if(now>=room.goAt+10000)for(const uid of players)if(!entries[uid])entries[uid]={ms:500,kind:'timeout'};
  if(players.some(uid=>!entries[uid]))return;
  if(room.round>=5){room.status='finished';return room}
  room.round++;room.goAt=now+delay;return room;
