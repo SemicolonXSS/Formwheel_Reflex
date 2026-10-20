@@ -18,6 +18,9 @@ let waiting = false;
 let gameActive = false;
 let phase = "idle";
 let transitionTimer = null;
+let missTimer = null;
+const FAILURE_MS = 500;
+const RESPONSE_LIMIT_MS = 5000;
 let best = 0;
 try { best = Number(localStorage.getItem("formwheel_reflex_best") || 0) || 0; } catch {}
 
@@ -35,6 +38,7 @@ function showGame(){
   game.style.display = "block";
   clearTimeout(timer);
   clearTimeout(transitionTimer);
+  clearTimeout(missTimer);
   round = 0;
   times = [];
   gameActive = false;
@@ -78,18 +82,31 @@ function nextRound(retry = false){
     phase = "go";
     goAt = performance.now();
     setStage("go","GO!","지금 클릭!");
+    clearTimeout(missTimer);
+    missTimer = setTimeout(()=>{
+      if(!gameActive || phase !== "go") return;
+      recordAttempt(FAILURE_MS,"TIME OUT","미응답 · 500 ms로 기록");
+    },RESPONSE_LIMIT_MS);
   }, delay);
 }
 
-function early(){
-  phase = "early";
+function recordAttempt(time,title,sub){
+  phase = "done";
   clearTimeout(timer);
+  clearTimeout(missTimer);
+  times.push(time);
   waiting = false;
-  setStage("early","TOO EARLY!","너무 빨랐어요");
+  setStage("done",title,sub);
+  clearTimeout(transitionTimer);
   transitionTimer = setTimeout(()=>{
     if(!gameActive) return;
-    nextRound(true);
-  },900);
+    if(round >= maxRounds) finish();
+    else nextRound();
+  },650);
+}
+
+function early(){
+  recordAttempt(FAILURE_MS,"TOO EARLY!","성급한 응답 · 500 ms로 기록");
 }
 
 function hit(){
@@ -99,16 +116,8 @@ function hit(){
     return;
   }
   if(phase !== "go") return;
-  phase = "done";
   const time = Math.round(performance.now() - goAt);
-  times.push(time);
-  setStage("done",`${time} ms`,"좋아요!");
-  waiting = true;
-  transitionTimer = setTimeout(()=>{
-    if(!gameActive) return;
-    if(round >= maxRounds) finish();
-    else nextRound();
-  },650);
+  recordAttempt(time,`${time} ms`,"좋아요!");
 }
 
 // Switching tabs or locking the screen must not create unfair reaction times.
@@ -118,6 +127,7 @@ document.addEventListener("visibilitychange", () => {
     if(gameActive && (phase === "waiting" || phase === "go")){
       pausedForVisibility = true;
       clearTimeout(timer);
+      clearTimeout(missTimer);
       waiting = false;
       phase = "paused";
       setStage("ready","PAUSED","화면으로 돌아오면 현재 라운드를 다시 시작합니다");
@@ -157,6 +167,7 @@ function finish(){
   phase = "finished";
   clearTimeout(transitionTimer);
   clearTimeout(timer);
+  clearTimeout(missTimer);
   const avg = Math.round(times.reduce((a,b)=>a+b,0)/times.length);
   const personalBest = Math.min(...times);
 
