@@ -186,9 +186,9 @@ function finish(){
   }
   document.getElementById("finalTime").textContent = avg;
   document.getElementById("rank").textContent = getRank(avg);
-  document.getElementById("bestStat").textContent = `${best} ms`;
+  document.getElementById("bestStat").textContent = best ? `${best} ms` : "기록 없음";
   document.getElementById("avgStat").textContent = `${avg} ms`;
-  document.getElementById("roundStat").textContent = `${times.length}`;
+  document.getElementById("roundStat").textContent = `${validTimes.length}회 성공 / ${times.length}회 도전`;
 
   game.style.display = "none";
   result.style.display = "block";
