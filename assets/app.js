@@ -67,6 +67,7 @@ function setStage(type,title,sub){
   stage.className = "stage " + type;
   stageTitle.textContent = title;
   stageSub.textContent = sub;
+  stage.setAttribute("aria-label", `${title}. ${sub}`);
 }
 
 function nextRound(retry = false){
@@ -118,7 +119,7 @@ function hit(){
     return;
   }
   if(phase !== "go") return;
-  const time = Math.round(performance.now() - goAt);
+  const time = Math.max(1, Math.round(performance.now() - goAt));
   validTimes.push(time);
   recordAttempt(time,`${time} ms`,"좋아요!");
 }
