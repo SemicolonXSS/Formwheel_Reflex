@@ -12,6 +12,7 @@ const bestText = document.getElementById("bestText");
 let round = 0;
 let maxRounds = 5;
 let times = [];
+let validTimes = [];
 let timer = null;
 let goAt = 0;
 let waiting = false;
@@ -41,6 +42,7 @@ function showGame(){
   clearTimeout(missTimer);
   round = 0;
   times = [];
+  validTimes = [];
   gameActive = false;
   phase = "idle";
   waiting = false;
@@ -117,6 +119,7 @@ function hit(){
   }
   if(phase !== "go") return;
   const time = Math.round(performance.now() - goAt);
+  validTimes.push(time);
   recordAttempt(time,`${time} ms`,"좋아요!");
 }
 
@@ -169,9 +172,9 @@ function finish(){
   clearTimeout(timer);
   clearTimeout(missTimer);
   const avg = Math.round(times.reduce((a,b)=>a+b,0)/times.length);
-  const personalBest = Math.min(...times);
+  const personalBest = validTimes.length ? Math.min(...validTimes) : null;
 
-  if(!best || personalBest < best){
+  if(personalBest !== null && (!best || personalBest < best)){
     best = personalBest;
     try { localStorage.setItem("formwheel_reflex_best", best); } catch {}
   }
