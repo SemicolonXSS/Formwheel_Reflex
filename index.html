@@ -30,7 +30,7 @@
       <div class="rule"><b>🎯 CLICK</b><span>최대한 빠르게</span></div>
       <div class="rule"><b>🏆 RECORD</b><span>최고 기록에 도전</span></div>
     </div>
-    <button class="primary" id="startBtn">게임 시작</button>
+    <div style="margin:12px 0"><b>🎯 도전 모드</b><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" data-reflex-rounds="3" aria-pressed="false" onclick="setReflexRounds(3)">⚡ 3라운드</button><button type="button" data-reflex-rounds="5" aria-pressed="true" onclick="setReflexRounds(5)">🎯 5라운드</button><button type="button" data-reflex-rounds="10" aria-pressed="false" onclick="setReflexRounds(10)">🏆 10라운드</button></div></div><button class="primary" id="startBtn">게임 시작</button>
   </section>
 
   <section class="card game" id="game">
@@ -57,7 +57,7 @@
       <div class="stat"><b id="avgStat">—</b><span>AVERAGE</span></div>
       <div class="stat"><b id="roundStat">—</b><span>ROUNDS</span></div>
     </div>
-    <div class="actions">
+    <p id="reflexAwards" role="status" style="margin-top:12px;line-height:1.9"></p><div class="actions">
       <button class="secondary" id="againBtn">다시 하기</button>
       <button class="primary" id="gamesBtn">Games로</button>
     </div>
@@ -65,7 +65,7 @@
 <section class="card" style="padding:24px;margin-top:20px"><h2>⚔️ Battle</h2><p id="battleNetwork" role="status">연결 확인 중</p><label>닉네임 <input id="battleName" maxlength="12" autocomplete="nickname"></label><label>방 코드 <input id="battleCode" maxlength="4" inputmode="numeric"></label><div class="actions" style="margin-top:12px"><button id="battleCreate" class="secondary">방 만들기</button><button id="battleJoin" class="secondary">참가</button><button id="battleStart" class="primary" hidden>5라운드 시작 / 재시작</button><button id="battleLeave" class="secondary" hidden>나가기</button></div><p id="battleMessage" role="status"></p><button id="battleTap" class="primary" style="height:190px;font-size:36px;touch-action:manipulation" hidden>READY</button><ol id="battlePlayers"></ol></section>
 </main>
 
-<script src="./assets/app.js?v=20261021-random5"></script>
+<script src="./assets/app.js?v=20261021-random7"></script>
 <script type="module" src="./modules/battle.js?v=bbb6e8c24ed4"></script>
 <script type="module" src="https://semicolonxss.github.io/Formwheel/shared/challenge-4050.js?v=20261011"></script>
 <script type="module" src="https://semicolonxss.github.io/Formwheel/assets/live-presence.js?v=20261017-duration"></script>
