@@ -11,6 +11,10 @@ const bestText = document.getElementById("bestText");
 
 let round = 0;
 let maxRounds = 5;
+const reflexBadges = [ ["first","🎮 첫 완주"],["perfect","🎯 올클리어"],["fast","⚡ 평균 300ms"],["lightning","🌩️ 최고 200ms"] ];
+function setReflexRounds(n){maxRounds=n;document.querySelectorAll("[data-reflex-rounds]").forEach(b=>b.setAttribute("aria-pressed",String(Number(b.dataset.reflexRounds)===n)));}
+window.setReflexRounds=setReflexRounds;
+function reflexAwards(avg){let owned={};try{owned=JSON.parse(localStorage.getItem("fw_reflex_awards_v1")||"{}")}catch{};owned.first=true;if(validTimes.length===times.length)owned.perfect=true;if(avg<=300&&validTimes.length===times.length)owned.fast=true;if(best&&best<=200)owned.lightning=true;try{localStorage.setItem("fw_reflex_awards_v1",JSON.stringify(owned))}catch{};document.getElementById("reflexAwards").textContent=reflexBadges.map(([id,label])=>owned[id]?label+" ✅":label+" 🔒").join(" · ");}
 let times = [];
 let validTimes = [];
 let timer = null;
@@ -188,6 +192,7 @@ function finish(){
   document.getElementById("rank").textContent = getRank(avg);
   document.getElementById("bestStat").textContent = best ? `${best} ms` : "기록 없음";
   document.getElementById("avgStat").textContent = `${avg} ms`;
+  reflexAwards(avg);
   document.getElementById("roundStat").textContent = `${validTimes.length}회 성공 / ${times.length}회 도전`;
 
   game.style.display = "none";
