@@ -1,7 +1,7 @@
 import {initializeApp,getApps,getApp} from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
 import {getDatabase,ref,onValue,runTransaction,onDisconnect,set,get} from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js';
 import {initializeAuth,browserSessionPersistence,signInAnonymously} from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js';
-import {submit,advance,ranking} from './battle-state.js?v=76713edb7376';
+import {submit,advance,ranking} from './battle-state.js?v=20261024-audit1';
 const config={apiKey:'AIzaSyBreTSe1m0-xlbF4aupnU5isRZCihR25IE',authDomain:'formwheel.firebaseapp.com',databaseURL:'https://formwheel-default-rtdb.firebaseio.com',projectId:'formwheel',appId:'1:431583088241:web:74e0e34ea1e3e1170c55d0'};
 const app=getApps().find(a=>a.name==='formwheel-reflex')?getApp('formwheel-reflex'):initializeApp(config,'formwheel-reflex'),db=getDatabase(app),auth=initializeAuth(app,{persistence:browserSessionPersistence}),$=id=>document.getElementById(id);
 let uid='',code='',room=null,unsubscribe=null,offset=0,connected=false,raf=0,shownRound=0,shownAt=0,submittedRound=0,advancing=false;

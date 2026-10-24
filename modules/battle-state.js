@@ -1,7 +1,7 @@
 export function submit(room,uid,roundNumber,result){
  if(!room||room.status!=='playing'||room.round!==roundNumber||!room.players?.[uid]||room.results?.[roundNumber]?.[uid])return;
  if(!Number.isInteger(result.ms)||result.ms<0||result.ms>2000||!['hit','early','timeout'].includes(result.kind))return;
- room.results??={};room.results[roundNumber]??={};room.results[roundNumber][uid]={ms:result.ms,kind:result.kind};return room;
+ room.results??={};room.results[roundNumber]??={};room.results[roundNumber][uid]={ms:result.kind==='hit'?result.ms:500,kind:result.kind};return room;
 }
 export function advance(room,now,delay){
  if(!room||room.status!=='playing')return;
