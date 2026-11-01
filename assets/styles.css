@@ -50,3 +50,11 @@ h1{margin:0;font-size:38px;letter-spacing:-2px}
  .stage{min-height:340px}
  .result .time{font-size:60px}
 }
+
+/* GO signal: the entire solo-game viewport turns dark immediately. */
+body.reflex-go-active,body.reflex-go-active .app{background:#090a0d;color:#fff}
+body.reflex-go-active .game{background:#090a0d;border-color:#090a0d;box-shadow:none}
+body.reflex-go-active .game-top,body.reflex-go-active .note{color:#d3d5dd}
+body.reflex-go-active .stage.go{background:#090a0d;color:#fff;transition:none}
+body.reflex-go-active .header .logo,body.reflex-go-active .header .logo span{color:#fff}
+body.reflex-go-active .header .home{background:#22242a;border-color:#454751;color:#fff}
