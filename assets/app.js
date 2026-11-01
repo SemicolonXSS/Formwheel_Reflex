@@ -188,6 +188,7 @@ function finish(){
   if(avg<=300 && window.opener && !window.opener.closed){
     window.opener.postMessage({type:"formwheel-spotlight-result-v1",project:"Reflex",value:avg},"https://semicolonxss.github.io");
   }
+  saveReflexHistory(avg);
   document.getElementById("finalTime").textContent = avg;
   document.getElementById("rank").textContent = getRank(avg);
   document.getElementById("bestStat").textContent = best ? `${best} ms` : "기록 없음";
@@ -201,3 +202,36 @@ function finish(){
 }
 
 updateBest();
+
+// Personal solo history is device-local; no unverified scores are uploaded.
+const REFLEX_HISTORY_KEY = "fw_reflex_solo_history_v1";
+function readReflexHistory(){
+  try { const rows=JSON.parse(localStorage.getItem(REFLEX_HISTORY_KEY)||"[]");
+    return Array.isArray(rows)?rows.filter(r=>r&&Number.isFinite(r.avg)&&r.avg>=1&&r.avg<=5000&&[3,5,10].includes(r.rounds)).slice(0,50):[];
+  } catch {return [];}
+}
+function renderReflexHistory(){
+  const list=document.getElementById("reflexHistoryList"),summary=document.getElementById("reflexHistorySummary");
+  if(!list||!summary)return;
+  const rows=readReflexHistory();
+  list.replaceChildren();
+  summary.textContent=rows.length?`저장된 플레이 ${rows.length}회 · 최고 평균 ${Math.min(...rows.map(r=>r.avg))}ms`:"아직 저장된 플레이 기록이 없어요.";
+  rows.slice(0,10).forEach((r,i)=>{
+    const li=document.createElement("li");
+    const date=new Date(r.at);
+    li.textContent=`${Number.isNaN(date.getTime())?"기록":date.toLocaleDateString("ko-KR")} · 평균 ${r.avg}ms · ${r.rounds}라운드 · 성공 ${r.success}회`;
+    list.append(li);
+  });
+}
+function saveReflexHistory(avg){
+  const rows=readReflexHistory();
+  rows.unshift({avg,rounds:times.length,success:validTimes.length,at:new Date().toISOString()});
+  try{localStorage.setItem(REFLEX_HISTORY_KEY,JSON.stringify(rows.slice(0,50)));}catch{}
+  renderReflexHistory();
+}
+document.getElementById("reflexHistoryClear")?.addEventListener("click",()=>{
+  if(!confirm("이 기기에 저장된 Reflex 플레이 기록을 삭제할까요? 기존 최고 반응속도와 업적은 유지됩니다."))return;
+  try{localStorage.removeItem(REFLEX_HISTORY_KEY);}catch{}
+  renderReflexHistory();
+});
+renderReflexHistory();
