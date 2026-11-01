@@ -68,6 +68,7 @@ function updateBest(){
 }
 
 function setStage(type,title,sub){
+  document.body.classList.toggle("reflex-go-active", type === "go");
   stage.className = "stage " + type;
   stageTitle.textContent = title;
   stageSub.textContent = sub;
