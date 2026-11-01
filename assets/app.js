@@ -216,7 +216,9 @@ function renderReflexHistory(){
   const rows=readReflexHistory();
   list.replaceChildren();
   summary.textContent=rows.length?`저장된 플레이 ${rows.length}회 · 최고 평균 ${Math.min(...rows.map(r=>r.avg))}ms`:"아직 저장된 플레이 기록이 없어요.";
-  rows.slice(0,10).forEach((r,i)=>{
+  const sort=document.getElementById("reflexHistorySort")?.value || "recent";
+  const ordered=rows.map((r,i)=>({...r,originalIndex:i})).sort((a,b)=>sort==="best"?(a.avg-b.avg || a.originalIndex-b.originalIndex):(a.originalIndex-b.originalIndex));
+  ordered.slice(0,10).forEach((r,i)=>{
     const li=document.createElement("li");
     const date=new Date(r.at);
     li.textContent=`${Number.isNaN(date.getTime())?"기록":date.toLocaleDateString("ko-KR")} · 평균 ${r.avg}ms · ${r.rounds}라운드 · 성공 ${r.success}회`;
@@ -229,6 +231,7 @@ function saveReflexHistory(avg){
   try{localStorage.setItem(REFLEX_HISTORY_KEY,JSON.stringify(rows.slice(0,50)));}catch{}
   renderReflexHistory();
 }
+document.getElementById("reflexHistorySort")?.addEventListener("change",renderReflexHistory);
 document.getElementById("reflexHistoryClear")?.addEventListener("click",()=>{
   if(!confirm("이 기기에 저장된 Reflex 플레이 기록을 삭제할까요? 기존 최고 반응속도와 업적은 유지됩니다."))return;
   try{localStorage.removeItem(REFLEX_HISTORY_KEY);}catch{}
