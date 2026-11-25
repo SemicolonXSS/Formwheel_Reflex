@@ -37,6 +37,19 @@ document.getElementById("logo").addEventListener("click", goHome);
 document.getElementById("homeBtn").addEventListener("click", goHome);
 document.getElementById("gamesBtn").addEventListener("click", goHome);
 
+let ghostEnabled=false,ghostBaseline=null;
+try{ghostEnabled=localStorage.getItem("fw_reflex_ghost_enabled")==="true"}catch{}
+const ghostToggle=document.createElement("label");
+ghostToggle.style.cssText="display:flex;align-items:center;gap:10px;margin:14px 0;font-weight:700";
+const ghostInput=document.createElement("input");ghostInput.type="checkbox";ghostInput.checked=ghostEnabled;
+ghostToggle.append(ghostInput,document.createTextNode("👻 GHOST RACE · 과거의 나와 대결"));
+document.getElementById("startBtn").before(ghostToggle);
+const ghostGame=document.createElement("p"),ghostResult=document.createElement("p");
+for(const el of [ghostGame,ghostResult]){el.hidden=true;el.setAttribute("role","status");el.style.cssText="margin:12px 0;font-weight:700;line-height:1.6"}
+document.getElementById("roundStartBtn").after(ghostGame);
+document.getElementById("reflexAwards").before(ghostResult);
+ghostInput.addEventListener("change",()=>{ghostEnabled=ghostInput.checked;try{localStorage.setItem("fw_reflex_ghost_enabled",String(ghostEnabled))}catch{}});
+function ghostComparison(value){const delta=ghostBaseline-value;return delta>0?delta+"ms 단축!":delta<0?(-delta)+"ms 차이":"동점!"}
 function showGame(){
   intro.style.display = "none";
   result.style.display = "none";
@@ -53,6 +66,9 @@ function showGame(){
   roundText.textContent = `ROUND 1 / ${maxRounds}`;
   setStage("ready", "READY", "아래 시작 버튼을 누르면 시작합니다");
   document.getElementById("roundStartBtn").hidden = false;
+  ghostBaseline=null;
+  ghostGame.hidden=!ghostEnabled;ghostResult.hidden=true;
+  if(ghostEnabled){const rows=readReflexHistory().filter(r=>r.rounds===maxRounds&&r.success===r.rounds);ghostBaseline=rows.length?Math.min(...rows.map(r=>r.avg)):null;ghostGame.textContent=ghostBaseline===null?"👻 첫 완주 기록에 도전!":"👻 고스트 목표 평균 "+ghostBaseline+"ms";}
   updateBest();
 }
 
@@ -103,6 +119,7 @@ function recordAttempt(time,title,sub){
   clearTimeout(timer);
   clearTimeout(missTimer);
   times.push(time);
+  if(ghostEnabled){const avg=Math.round(times.reduce((a,b)=>a+b,0)/times.length);ghostGame.textContent=ghostBaseline===null?"👻 현재 평균 "+avg+"ms · 첫 기록 도전":"👻 현재 평균 "+avg+"ms / 고스트 "+ghostBaseline+"ms · "+ghostComparison(avg);}
   waiting = false;
   setStage("done",title,sub);
   clearTimeout(transitionTimer);
@@ -189,6 +206,7 @@ function finish(){
   if(avg<=300 && window.opener && !window.opener.closed){
     window.opener.postMessage({type:"formwheel-spotlight-result-v1",project:"Reflex",value:avg},"https://semicolonxss.github.io");
   }
+  if(ghostEnabled){ghostResult.hidden=false;ghostResult.textContent=validTimes.length!==times.length?"👻 실패 라운드 포함 · 고스트 승패 제외":ghostBaseline===null?"👻 첫 고스트 기록 등록: "+avg+"ms":"👻 내 평균 "+avg+"ms / 고스트 "+ghostBaseline+"ms · "+ghostComparison(avg);}
   saveReflexHistory(avg);
   document.getElementById("finalTime").textContent = avg;
   document.getElementById("rank").textContent = getRank(avg);
